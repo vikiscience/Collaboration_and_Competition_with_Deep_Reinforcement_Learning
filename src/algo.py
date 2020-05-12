@@ -90,8 +90,8 @@ class DRLAlgo:
             if np.any(dones):  # exit loop if episode finished
                 break
 
-        score = np.mean(scores)  # mean of scores over all agents
-        print("Score: {}".format(score))
+        score = np.max(scores)  # max of scores over all agents
+        print("Score: {:.3f}".format(score))
 
         self.env.close()
 
