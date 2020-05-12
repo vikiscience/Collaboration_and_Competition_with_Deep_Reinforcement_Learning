@@ -1,5 +1,5 @@
 import const
-from src import agent, algo, hyperparameter_search, utils_env
+from src import agent, algo, utils_env
 
 import numpy as np
 import random
@@ -21,21 +21,31 @@ def try_random_agent():
     env = utils_env.Environment()
     brain_name = env.brain_names[0]
 
-    env_info = env.reset(train_mode=False)[brain_name]  # reset the environment
-    states = env_info.vector_observations  # get the current state (for each agent)
-    scores = np.zeros(const.num_agents)  # initialize the score (for each agent)
-    while True:
-        actions = np.random.randn(const.num_agents, action_size)  # select an action (for each agent)
-        actions = np.clip(actions, -1, 1)  # all actions between -1 and 1
-        env_info = env.step(actions)[brain_name]  # send all actions to tne environment
-        next_states = env_info.vector_observations  # get next state (for each agent)
-        rewards = env_info.rewards  # get reward (for each agent)
-        dones = env_info.local_done  # see if episode finished
-        scores += rewards  # update the score (for each agent)
-        states = next_states  # roll over states to next time step
-        if np.any(dones):  # exit loop if episode finished
-            break
-    print('Total score (averaged over agents) this episode: {}'.format(np.mean(scores)))
+    for i in range(5):
+        env_info = env.reset(train_mode=False)[brain_name]  # reset the environment
+        states = env_info.vector_observations  # get the current state (for each agent)
+        scores = np.zeros(const.num_agents)  # initialize the score (for each agent)
+
+        while True:
+            actions = np.random.randn(const.num_agents, action_size)  # select an action (for each agent)
+            actions = np.clip(actions, -1, 1)  # all actions between -1 and 1
+            env_info = env.step(actions)[brain_name]  # send all actions to tne environment
+            next_states = env_info.vector_observations  # get next state (for each agent)
+            rewards = env_info.rewards  # get reward (for each agent)
+            dones = env_info.local_done  # see if episode finished
+            scores += rewards  # update the score (for each agent)
+            states = next_states  # roll over states to next time step
+            if np.any(dones):  # exit loop if episode finished
+                break
+
+        print('Episode {}, score (max over agents): {}'.format(i, np.max(scores)))
+        print('Episode {}, score of each agent: ['.format(i), '; '.join(['{:.3f}'.format(s) for s in scores]), ']')
+
+        print(actions)
+        print(next_states)
+        print(rewards)
+        print(dones)
+
     env.close()
 
 
@@ -84,7 +94,8 @@ if __name__ == '__main__':
     elif exec == 'test':
         test_default_algo(use_ref_model)
     elif exec == 'grid':
-        hyperparameter_search.grid_search()
+        pass  # todo
+        # hyperparameter_search.grid_search()
     else:
         get_env_info()
         # try_random_agent()
