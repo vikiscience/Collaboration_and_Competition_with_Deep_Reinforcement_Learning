@@ -26,9 +26,6 @@ class DRLAlgo:
 
         history = []
 
-        # Evaluate untrained policy
-        evaluations = [self.eval_policy(self.agent.policy, const.random_seed)]
-
         for e in range(self.num_episodes):
             env_info = self.env.reset(train_mode=True)[self.brain_name]  # reset the environment
             states = env_info.vector_observations  # get the current state (s_t)
@@ -57,20 +54,14 @@ class DRLAlgo:
                 if np.any(dones):
                     break
 
-            score = np.mean(scores)  # mean of scores over all agents
+            score = np.max(scores)  # max of scores over all agents for this episode
             print("\r -> Episode: {}/{}, score: {}".format(e + 1, self.num_episodes, score), end='')
             history.append(score)
-
-            # Evaluate episode
-            if (e + 1) % self.policy_eval_freq == 0:
-                avg_reward = self.eval_policy(self.agent.policy, const.random_seed)
-                evaluations.append(avg_reward)
 
             if (e + 1) % 100 == 0 or e + 1 == self.num_episodes:
                 self.agent.save()
 
         print('History:', history)
-        print('Evaluations:', evaluations)
         utils_plot.plot_history_rolling_mean(history, fp=self.image_path)
 
         if with_close:
@@ -107,24 +98,3 @@ class DRLAlgo:
     def set_image_path(self, i):
         p = self.image_path
         self.image_path = Path(p.parent, 'score_' + str(i) + p.suffix)
-
-    # Runs policy for X episodes and returns average reward
-    # A fixed seed is used for the eval environment
-    def eval_policy(self, policy, seed, eval_episodes=const.rolling_mean_N):
-        history = []
-        for _ in range(eval_episodes):
-            scores = np.zeros(const.num_agents)
-            env_info = self.env.reset(train_mode=True)[self.brain_name]
-            states = env_info.vector_observations
-            while True:
-                actions = policy.select_action(np.array(states[0])).reshape(1, -1)  # todo
-                env_info = self.env.step(actions)[self.brain_name]
-                rewards = env_info.rewards
-                dones = env_info.local_done
-                scores += rewards
-                if np.any(dones):
-                    break
-            history.append(np.mean(scores))  # mean of scores over all agents
-
-        avg_score = np.mean(history)  # mean over all episodes
-        return avg_score
