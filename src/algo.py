@@ -44,6 +44,7 @@ class DRLAlgo:
 
                 # Memorize new sample, replay, update target network
                 self.agent.do_stuff(states[0], actions[0], rewards[0], next_states[0], dones[0], t)  # todo [0]
+                self.agent.do_stuff(states[1], actions[1], rewards[1], next_states[1], dones[1], t)  # todo [1]
 
                 states = next_states
                 scores += rewards
@@ -53,13 +54,13 @@ class DRLAlgo:
                     break
 
             score = np.max(scores)  # max of scores over all agents for this episode
-            print("\r -> Episode: {}/{}, score: {}".format(e + 1, self.num_episodes, score), end='')
+            print("\r -> Episode: {}/{}, score: {:.3f}".format(e + 1, self.num_episodes, score), end='')
             history.append(score)
 
             if (e + 1) % 100 == 0 or e + 1 == self.num_episodes:
                 self.agent.save()
 
-        print('History:', history)
+        const.myprint('History:', history)
         utils_plot.plot_history_rolling_mean(history, fp=self.image_path)
 
         if with_close:
