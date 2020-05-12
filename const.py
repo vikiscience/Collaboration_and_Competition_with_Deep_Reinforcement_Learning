@@ -18,11 +18,10 @@ action_size = 2
 max_action = 1.
 episode_length = 300
 verbose = False
-high_score = 30
+high_score = 0.5
 
 # algo params
 num_episodes = 250
-policy_eval_freq = 50
 
 # agent params
 memory_size = 40000
@@ -32,8 +31,8 @@ expl_noise = 0.3
 
 # model params
 model_learning_rate = 0.001
-num_fc_actor = 128
-num_fc_critic = 128
+num_fc_1 = 64
+num_fc_2 = 32
 
 
 def myprint(*args, **kwargs):

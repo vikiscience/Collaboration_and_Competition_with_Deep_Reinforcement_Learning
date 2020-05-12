@@ -9,8 +9,7 @@ class DRLAlgo:
     image_path = const.file_path_img_score
 
     def __init__(self, env, agent,
-                 num_episodes: int = const.num_episodes,
-                 policy_eval_freq: int = const.policy_eval_freq):
+                 num_episodes: int = const.num_episodes):
         self.env = env
         self.brain_name = env.brain_names[0]
         self.agent = agent
@@ -19,7 +18,6 @@ class DRLAlgo:
 
         # algo params
         self.num_episodes = num_episodes
-        self.policy_eval_freq = policy_eval_freq
 
     def train(self, with_close=True):
         print('Training ...')
@@ -36,7 +34,7 @@ class DRLAlgo:
             while True:
 
                 # choose a_t using epsilon-greedy policy
-                actions = self.agent.act(states, t)
+                actions = self.agent.act(states, t)  # todo: each agent receives its own, local observation
 
                 # take action a_t, observe r_{t+1} and s_{t+1}
                 env_info = self.env.step(actions)[self.brain_name]  # send the action to the environment
