@@ -68,30 +68,33 @@ class DRLAlgo:
 
         return history
 
-    def test(self):
+    def test(self, num_episodes=const.num_episodes_test):
         self.agent.load()
 
-        env_info = self.env.reset(train_mode=False)[self.brain_name]  # reset the environment
-        states = env_info.vector_observations  # get the current state (for each agent)
-        scores = np.zeros(const.num_agents)  # initialize the score (for each agent)
-        t = 0
-        i = self.agent.start_policy_training_iter + 1  # set high i to avoid random actions in the beginning
+        final_scores = []
+        for i in range(num_episodes):
+            env_info = self.env.reset(train_mode=False)[self.brain_name]  # reset the environment
+            states = env_info.vector_observations  # get the current state (for each agent)
+            scores = np.zeros(const.num_agents)  # initialize the score (for each agent)
+            t = 0
+            i = self.agent.start_policy_training_iter + 1  # set high i to avoid random actions in the beginning
 
-        while True:
-            actions = self.agent.act(states, i)  # select an action (for each agent)
-            env_info = self.env.step(actions)[self.brain_name]  # send all actions to tne environment
-            next_states = env_info.vector_observations  # get next state (for each agent)
-            rewards = env_info.rewards  # get reward (for each agent)
-            dones = env_info.local_done  # see if episode has finished
-            scores += rewards  # update the score (for each agent)
-            states = next_states  # roll over states to next time step
-            t += 1
-            if np.any(dones):  # exit loop if episode finished
-                break
+            while True:
+                actions = self.agent.act(states, i)  # select an action (for each agent)
+                env_info = self.env.step(actions)[self.brain_name]  # send all actions to tne environment
+                next_states = env_info.vector_observations  # get next state (for each agent)
+                rewards = env_info.rewards  # get reward (for each agent)
+                dones = env_info.local_done  # see if episode has finished
+                scores += rewards  # update the score (for each agent)
+                states = next_states  # roll over states to next time step
+                t += 1
+                if np.any(dones):  # exit loop if episode finished
+                    break
 
-        score = np.max(scores)  # max of scores over all agents
-        print("Score: {:.3f}".format(score))
+            score = np.max(scores)  # max of scores over all agents
+            final_scores.append(score)
 
+        print("Final scores (per episode):", final_scores)
         self.env.close()
 
     def set_image_path(self, i):
