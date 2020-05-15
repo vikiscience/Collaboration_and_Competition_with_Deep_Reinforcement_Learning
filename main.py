@@ -17,11 +17,11 @@ N = const.rolling_mean_N
 warnings.filterwarnings("ignore", category=UserWarning)
 
 
-def try_random_agent():
+def try_random_agent(num_episodes=const.num_episodes_test):
     env = utils_env.Environment()
     brain_name = env.brain_names[0]
 
-    for i in range(5):
+    for i in range(num_episodes):
         env_info = env.reset(train_mode=False)[brain_name]  # reset the environment
         states = env_info.vector_observations  # get the current state (for each agent)
         scores = np.zeros(const.num_agents)  # initialize the score (for each agent)
@@ -41,11 +41,6 @@ def try_random_agent():
         print('Episode {}, score (max over agents): {}'.format(i, np.max(scores)))
         print('Episode {}, score of each agent: ['.format(i), '; '.join(['{:.3f}'.format(s) for s in scores]), ']')
 
-        print(actions)
-        print(next_states)
-        print(rewards)
-        print(dones)
-
     env.close()
 
 
@@ -54,7 +49,8 @@ def train_default_algo():
     # use default params
     ag = agent.DRLAgent()
     al = algo.DRLAlgo(env, ag)
-    al.train()
+    history = al.train()
+    print('\nFinal score: {:.3f}'.format(np.mean(history[-const.rolling_mean_N:])))
 
 
 def test_default_algo(use_ref_model: bool = False):
