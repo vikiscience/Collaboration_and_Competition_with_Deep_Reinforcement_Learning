@@ -43,8 +43,10 @@ class DRLAlgo:
                 dones = env_info.local_done  # see if episode has finished
 
                 # Memorize new sample, replay, update target network
-                self.agent.do_stuff(states[0], actions[0], rewards[0], next_states[0], dones[0], t)  # todo [0]
-                self.agent.do_stuff(states[1], actions[1], rewards[1], next_states[1], dones[1], t)  # todo [1]
+                if states[0][-4] < 0:  # 1. agent (right) was in turn
+                    self.agent.do_stuff(states[0], actions[0], rewards[0], next_states[0], dones[0], t)  # todo [0]
+                else:  # 2. agent (left) was in turn
+                    self.agent.do_stuff(states[1], actions[1], rewards[1], next_states[1], dones[1], t)  # todo [1]
 
                 states = next_states
                 scores += rewards
