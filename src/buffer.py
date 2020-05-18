@@ -37,4 +37,4 @@ class ReplayBuffer:
         t_rewards = torch.FloatTensor(reward_batch).to(device)
         t_next_states = torch.FloatTensor(next_states_batch).to(device)
         t_not_dones = torch.FloatTensor(not_dones).to(device)
-        return t_states, t_actions, t_next_states, t_rewards, t_not_dones  # this order for usage in 'models.py'
+        return t_states, t_actions, t_rewards, t_next_states, t_not_dones
