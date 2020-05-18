@@ -1,5 +1,5 @@
 import const
-from src import agent, algo, utils_env
+from src import agent, algo, hyperparameter_search, utils_env
 
 import numpy as np
 import random
@@ -44,11 +44,14 @@ def try_random_agent(num_episodes=const.num_episodes_test):
     env.close()
 
 
-def train_default_algo():
+def train_two_agents():
     env = utils_env.Environment()
     # use default params
-    ag = agent.DRLAgent()
-    al = algo.DRLAlgo(env, ag)
+    ag_1 = agent.DRLAgent()
+    ag_1.set_model_path(1)
+    ag_2 = agent.DRLAgent()
+    ag_2.set_model_path(2)
+    al = algo.DRLAlgo(env, ag_1, ag_2)
     history = al.train()
     print('\nFinal score: {:.3f}'.format(np.mean(history[-const.rolling_mean_N:])))
 
@@ -56,11 +59,14 @@ def train_default_algo():
 def test_default_algo(use_ref_model: bool = False):
     env = utils_env.Environment()
     # use default params
-    ag = agent.DRLAgent()
+    ag_1 = agent.DRLAgent()
+    ag_1.set_model_path(1)
+    ag_2 = agent.DRLAgent()
+    ag_2.set_model_path(2)
     if use_ref_model:
         print('... Test the agent using reference model ...')
-        ag.set_model_path('ref')
-    al = algo.DRLAlgo(env, ag)
+        ag_1.set_model_path('ref')  # todo
+    al = algo.DRLAlgo(env, ag_1, ag_2)
     al.test()
 
 
@@ -86,12 +92,11 @@ if __name__ == '__main__':
     use_ref_model = args.use_reference_model
 
     if exec == 'train':
-        train_default_algo()
+        train_two_agents()
     elif exec == 'test':
         test_default_algo(use_ref_model)
     elif exec == 'grid':
-        pass  # todo
-        # hyperparameter_search.grid_search()
+        hyperparameter_search.grid_search()
     else:
         get_env_info()
         # try_random_agent()
