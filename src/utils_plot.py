@@ -40,3 +40,17 @@ def plot_history_rolling_mean(hist, N=const.rolling_mean_N, fp=const.file_path_i
     plt.legend(loc='best')
     plt.savefig(fp)
     plt.close()
+
+
+def plot_loss(loss_lists, labels,
+              fp=const.file_path_img_loss):
+    for i, l in enumerate(loss_lists):
+        x = [elem[0] for elem in l]
+        y = [elem[1] for elem in l]
+        plt.plot(x, y, label=labels[i])
+    plt.xlabel('iteration')
+    plt.ylabel('loss')
+    plt.legend(loc='best')
+    plt.title('Actor & Critic Losses')
+    plt.savefig(fp)
+    plt.close()
