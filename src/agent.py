@@ -19,7 +19,6 @@ class DRLAgent:
                  memory_size: int = const.memory_size,
                  gamma: float = const.gamma,
                  batch_size: int = const.batch_size,
-                 expl_noise: float = const.expl_noise,
                  tau: float = const.tau,
                  model_learning_rate: float = const.model_learning_rate,
                  num_fc_1: int = const.num_fc_1,
@@ -32,7 +31,6 @@ class DRLAgent:
         self.memory = buffer.ReplayBuffer(memory_size)  # todo shared buffer for both agents
         self.gamma = gamma
         self.batch_size = batch_size
-        self.expl_noise = expl_noise
         self.tau = tau
         self.start_policy_training_iter = batch_size  # start training after: buffer_size >= batch_size
         self.policy_freq = const.policy_freq

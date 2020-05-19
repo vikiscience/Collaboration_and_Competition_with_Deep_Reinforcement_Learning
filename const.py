@@ -30,7 +30,6 @@ max_action = 1.
 memory_size = 200000  # 100000
 gamma = 0.99
 batch_size = 128
-expl_noise = 0.3
 tau = 0.06  # 0.001
 policy_freq = 1
 
