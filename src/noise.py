@@ -6,7 +6,7 @@ import numpy as np
 # Based on http://math.stackexchange.com/questions/1287634/implementing-ornstein-uhlenbeck-in-matlab
 class OrnsteinUhlenbeckActionNoise:
     def __init__(self, stddev=const.ou_stddev,
-                 theta=const.ou_theta, dt=const.ou_dt, x0=None):  # orig: theta=.15, dt=1e-2
+                 theta=const.ou_theta, dt=const.ou_dt, x0=None):
         self.theta = theta
         self.mu = np.zeros(const.action_size)
         self.sigma = stddev * np.ones(const.action_size)

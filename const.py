@@ -27,22 +27,22 @@ num_episodes = 1500
 max_action = 1.
 
 # agent params
-memory_size = 200000
+memory_size = 200000  # 100000
 gamma = 0.99
 batch_size = 128
 expl_noise = 0.3
 tau = 0.06  # 0.001
-policy_freq = 1  # 2
+policy_freq = 1
 
 # model params
-model_learning_rate = 0.001  # 0.00001
-num_fc_1 = 256  # 16
-num_fc_2 = 128  # 16
+model_learning_rate = 0.001  # 0.0001
+num_fc_1 = 256
+num_fc_2 = 128
 
 # noise params
 ou_stddev = 0.2
-ou_theta = .13
-ou_dt = 1
+ou_theta = 0.13  # 0.15
+ou_dt = 1  # 0.01
 eps_start = 6
 eps_end = 0
 
