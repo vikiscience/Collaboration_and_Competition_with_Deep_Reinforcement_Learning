@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import const
-from src import models, buffer
+from src import models, buffer, noise
 
 from pathlib import Path
 import numpy as np
@@ -37,6 +37,8 @@ class DRLAgent:
         self.start_policy_training_iter = batch_size  # start training after: buffer_size >= batch_size
         self.policy_freq = const.policy_freq
         self.t = 0
+        self.noise = noise.OrnsteinUhlenbeckActionNoise()
+        self.glie = noise.GLIE()
 
         # model params
         self.model_learning_rate = model_learning_rate
@@ -58,17 +60,23 @@ class DRLAgent:
         self._model_summary(self.actor, title='Actor')
         self._model_summary(self.critic, title='Critic')
 
+        # for plots
         self.actor_loss_list = []
         self.critic_loss_list = []
+        self.noise_list = []
 
-    def act(self, states):  # todo noise
+    def reset(self):
+        self.noise.reset()
+
+    def act(self, states):
         s_tensor = torch.Tensor(states)
         self.actor.eval()
         with torch.no_grad():
             a = self.actor.forward(s_tensor).detach().numpy()
         self.actor.train()
-        noise = np.random.normal(0, const.max_action * self.expl_noise, size=self.num_actions)
-        actions = a + noise  # result in shape (2,)
+        curr_noise = self.glie.get_eps() * self.noise()
+        self.noise_list.append(curr_noise)
+        actions = a + curr_noise  # result in shape (2,)
         actions = np.clip(actions, - const.max_action, const.max_action)
         return actions
 
@@ -144,7 +152,6 @@ class DRLAgent:
     def _train(self, agent_index):
         # Sample a minibatch from the replay memory
         states_batch, action_batch, reward_batch, next_states_batch, not_done_batch = self.memory.sample(self.batch_size)
-        #print(states_batch.shape, action_batch.shape, reward_batch.shape, next_states_batch.shape, done_batch.shape)
 
         # Compute Q targets for next states
         next_actions_batch = self.actor_target(next_states_batch)  # shape (batch_size, 2)
@@ -196,3 +203,6 @@ class DRLAgent:
 
             for param, target_param in zip(self.actor.parameters(), self.actor_target.parameters()):
                 target_param.data.copy_(self.tau * param.data + (1. - self.tau) * target_param.data)
+
+            # Update epsilon noise value
+            self.glie.update_eps()

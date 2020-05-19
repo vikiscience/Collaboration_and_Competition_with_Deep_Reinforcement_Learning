@@ -30,6 +30,8 @@ class DRLAlgo:
             env_info = self.env.reset(train_mode=True)[self.brain_name]  # reset the environment
             states = env_info.vector_observations  # get the current state (s_t)
             scores = np.zeros(const.num_agents)  # initialize the score
+            self.agent_1.reset()
+            self.agent_2.reset()
 
             while True:
                 # choose a_t using epsilon-greedy policy
@@ -74,12 +76,6 @@ class DRLAlgo:
         # plot scores
         const.myprint('History:', history)
         utils_plot.plot_history_rolling_mean(history, fp=self.image_path)
-
-        # plot losses
-        losses_lists = [self.agent_1.actor_loss_list, self.agent_2.actor_loss_list,
-                        self.agent_1.critic_loss_list, self.agent_2.critic_loss_list]
-        losses_labels = ['agent_1_actor', 'agent_2_actor', 'agent_1_critic', 'agent_2_critic']
-        utils_plot.plot_loss(losses_lists, losses_labels)
 
         if with_close:
             self.env.close()
