@@ -78,16 +78,15 @@ def grid_search():
     print('=' * 30, 'Grid Search', '=' * 30)
 
     params = {
-        'num_episodes': [500, 1000, 1500],
-        'max_action': [0.1, 0.5, 1.0],
-        'memory_size': [200000],
-        'gamma': [0.95, 0.99],
-        'batch_size': [64, 128, 256],
-        'tau': [0.01, 0.05],
-        'policy_freq': [1, 2, 3],
-        'model_learning_rate': [0.001, 0.0001],
-        'num_fc_1': [128, 64, 32, 16],
-        'num_fc_2': [128, 64, 32, 16]  # todo less that fc_1 or /2
+        'num_episodes': [500, 1000, 1500],  # --> 1500
+        'max_action': [0.1, 0.5, 1.0],  # --> 1.0
+        'memory_size': [100000, 200000],  # --> 200000
+        'gamma': [0.95, 0.99],  # --> 0.99
+        'batch_size': [64, 128, 256],  # --> 128
+        'tau': [0.01, 0.05, 0.06, 0.07, 0.1],  # -->0.06
+        'policy_freq': [1, 2, 3],  # --> 3
+        'model_learning_rate': [0.001, 0.0001],  # --> 0.001
+        'num_fc_1': [256, 128, 64, 32, 16]
     }
 
     grid = ParameterGrid(params)
@@ -101,6 +100,8 @@ def grid_search():
     df = pd.DataFrame(columns=key_list)
 
     for i, g in enumerate(grid):
+        if 'num_fc_1' in key_list:
+            g['num_fc_2'] = g['num_fc_1'] // 2
         rf.set_params(**g)
         score = rf.fit(i, env)
         result_dict[i] = {'score': score, 'grid': g}
@@ -109,7 +110,7 @@ def grid_search():
         d['score'] = score
         df = df.append(d, ignore_index=True)
 
-        print('Evaluated candidate:', i, result_dict[i])
+        print('\nEvaluated candidate:', i, result_dict[i])
         # save if best
         if score >= best_score:
             best_score = score
