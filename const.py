@@ -9,6 +9,8 @@ file_path_ref_model = model_path / 'model_ref.npy'
 file_path_img_score = output_path / 'score.png'
 file_path_ref_img_score = output_path / 'score_ref.png'
 file_path_img_loss = output_path / 'loss.png'
+file_path_img_actions = output_path / 'actions.png'
+file_path_img_noise = output_path / 'noise.png'
 
 # general params
 random_seed = 0  # 0xABCD

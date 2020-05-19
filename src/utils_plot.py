@@ -1,5 +1,6 @@
 import const
 
+import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 
@@ -52,5 +53,19 @@ def plot_loss(loss_lists, labels,
     plt.ylabel('loss')
     plt.legend(loc='best')
     plt.title('Actor & Critic Losses')
+    plt.savefig(fp)
+    plt.close()
+
+
+def plot_scatter(data, title_text='Text', fp=const.file_path_img_actions):
+    if type(data) == list:
+        data = np.array(data)
+    plt.scatter(data[:, 0], data[:, 1], label='agent_1')
+    if data.shape[1] == 4:
+        plt.scatter(data[:, 2], data[:, 3], label='agent_2')
+    plt.xlabel('move')
+    plt.ylabel('jump')
+    plt.legend(loc='best')
+    plt.title(title_text)
     plt.savefig(fp)
     plt.close()

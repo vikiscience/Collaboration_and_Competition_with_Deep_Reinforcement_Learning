@@ -1,9 +1,10 @@
 import const
-from src import agent, algo, hyperparameter_search, utils_env
+from src import agent, algo, hyperparameter_search, utils_env, utils_plot
 
-import numpy as np
-import random
 import argparse
+import numpy as np
+from pathlib import Path
+import random
 import warnings
 
 random_seed = const.random_seed
@@ -54,18 +55,40 @@ def train_two_agents():
     al = algo.DRLAlgo(env, ag_1, ag_2)
     history = al.train()
     print('\nFinal score: {:.3f}'.format(np.mean(history[-const.rolling_mean_N:])))
+    print('Final memory length:', ag_1.memory.get_length())
+
+    # plot losses
+    losses_lists = [ag_1.actor_loss_list, ag_2.actor_loss_list,
+                    ag_1.critic_loss_list, ag_2.critic_loss_list]
+    losses_labels = ['agent_1_actor', 'agent_2_actor', 'agent_1_critic', 'agent_2_critic']
+    utils_plot.plot_loss(losses_lists, losses_labels)
+
+    # plot noise
+    utils_plot.plot_scatter(ag_1.noise_list, title_text='Noise', fp=const.file_path_img_noise)
+
+    # plot memory actions
+    memory_actions = np.array([t[1] for t in ag_1.memory.memory])
+    utils_plot.plot_scatter(memory_actions, title_text='Actions', fp=const.file_path_img_actions)
+
+    # show mean memory actions
+    mean_a = np.mean(memory_actions, axis=0)
+    std_a = np.std(memory_actions, axis=0)
+    print('Mean/std actions agent_1:', mean_a[:2], std_a[:2])
+    print('Mean/std actions agent_2:', mean_a[2:], std_a[2:])
 
 
 def test_default_algo(use_ref_model: bool = False):
     env = utils_env.Environment()
-    # use default params
-    ag_1 = agent.DRLAgent()
-    ag_1.set_model_path(1)
-    ag_2 = agent.DRLAgent()
-    ag_2.set_model_path(2)
+    model_name_suffix = ''
     if use_ref_model:
         print('... Test the agent using reference model ...')
-        ag_1.set_model_path('ref')  # todo
+        model_name_suffix = 'ref_'
+
+    # use default params
+    ag_1 = agent.DRLAgent()
+    ag_1.set_model_path(model_name_suffix + str(1))
+    ag_2 = agent.DRLAgent()
+    ag_2.set_model_path(model_name_suffix + str(2))
     al = algo.DRLAlgo(env, ag_1, ag_2)
     al.test()
 
