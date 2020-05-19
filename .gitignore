@@ -132,6 +132,7 @@ dmypy.json
 .idea
 unity-environment.log
 models/*
-!models/model_ref.npy
+!models/model_ref_1.npy
+!models/model_ref_2.npy
 output/*
 !output/score_ref.png
