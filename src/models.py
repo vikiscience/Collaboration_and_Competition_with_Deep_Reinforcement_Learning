@@ -17,7 +17,8 @@ class Network(nn.Module):
         else:
             self.fc2 = nn.Linear(num_fc_1 + action_dim * 2, num_fc_2)
         self.fc3 = nn.Linear(num_fc_2, num_fc_last)
-        self.nonlin_layer = F.relu #F.leaky_relu
+        self.nonlin = 'relu'
+        self.nonlin_layer = getattr(F, self.nonlin)
         self.nonlin_layer_last = F.tanh
 
     def forward(self, state, action=None):
@@ -28,20 +29,17 @@ class Network(nn.Module):
         x = self.fc3(x)
         if self.is_actor:
             x = self.nonlin_layer_last(x)  # tanh for actor
-        #else:
-        #    x = self.nonlin_layer(x)
+        # else:
+        #     x = self.nonlin_layer(x)
         return x
 
-    def predict(self, state, action=None):
-        s_tensor = torch.Tensor(state).to(device)
-        a_tensor = (torch.Tensor(action).to(device) if action is not None else None)
-
-        self.eval()
-        with torch.no_grad():
-            result = self.forward(s_tensor, a_tensor).detach().numpy()
-        self.train()
-
-        return result
+    def reset_parameters(self):
+        self.fc1.weight.data.kaiming_normal_(mode='fan_in', nonlinearity=self.nonlin, gain=1)
+        self.fc1.bias.data.kaiming_normal_(mode='fan_in', nonlinearity=self.nonlin, gain=1)
+        self.fc2.weight.data.kaiming_normal_(mode='fan_in', nonlinearity=self.nonlin, gain=1)
+        self.fc2.bias.data.kaiming_normal_(mode='fan_in', nonlinearity=self.nonlin, gain=1)
+        self.fc3.weight.data.uniform_(-3e-3, 3e-3)
+        self.fc3.bias.data.uniform_(-3e-3, 3e-3)
 
 
 class Actor(Network):
