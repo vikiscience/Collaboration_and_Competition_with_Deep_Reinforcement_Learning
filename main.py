@@ -135,3 +135,4 @@ if __name__ == '__main__':
     else:
         get_env_info()
         # try_random_agent()
+        # plot_raw_noise()

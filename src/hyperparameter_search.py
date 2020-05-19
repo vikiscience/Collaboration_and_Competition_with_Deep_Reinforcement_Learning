@@ -86,7 +86,7 @@ def grid_search():
         'tau': [0.01, 0.05, 0.06, 0.07, 0.1],  # -->0.06
         'policy_freq': [1, 2, 3],  # --> 3
         'model_learning_rate': [0.001, 0.0001],  # --> 0.001
-        'num_fc_1': [256, 128, 64, 32, 16]
+        'num_fc_1': [256, 128, 64, 32, 16]  # --> 256
     }
 
     grid = ParameterGrid(params)
