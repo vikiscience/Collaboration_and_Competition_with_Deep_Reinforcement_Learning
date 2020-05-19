@@ -1,8 +1,9 @@
 import const
 from src import utils_plot
 
-from pathlib import Path
+from collections import deque
 import numpy as np
+from pathlib import Path
 
 
 class DRLAlgo:
@@ -22,6 +23,8 @@ class DRLAlgo:
         print('Training ...')
 
         history = []
+        rolling_window = deque(maxlen=const.rolling_mean_N)
+        solved = False
 
         for e in range(self.num_episodes):
             env_info = self.env.reset(train_mode=True)[self.brain_name]  # reset the environment
@@ -53,12 +56,20 @@ class DRLAlgo:
                     break
 
             score = np.max(scores)  # max of scores over all agents for this episode
-            print("\r -> Episode: {}/{}, score: {:.3f}".format(e + 1, self.num_episodes, score), end='')
+            rolling_window.append(score)
             history.append(score)
+            print("\r -> Episode: {}/{}, score: {:.3f}, avg_score: {:.3f}".format(e + 1,
+                                                                                  self.num_episodes,
+                                                                                  score,
+                                                                                  np.mean(rolling_window)), end='')
 
             if (e + 1) % 100 == 0 or e + 1 == self.num_episodes:
                 self.agent_1.save()
                 self.agent_2.save()
+
+            if np.mean(rolling_window) >= const.high_score and not solved:
+                print('\nEnv solved in {:d} episodes, avg_score: {:.3f}'.format(e, np.mean(rolling_window)))
+                solved = True
 
         # plot scores
         const.myprint('History:', history)
