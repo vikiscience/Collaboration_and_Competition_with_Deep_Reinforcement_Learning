@@ -16,7 +16,6 @@ class MyNavigator(BaseEstimator, ClassifierMixin):
                  memory_size: int = const.memory_size,
                  gamma: float = const.gamma,
                  batch_size: int = const.batch_size,
-                 expl_noise: float = const.expl_noise,
                  tau: float = const.tau,
                  policy_freq: int = const.policy_freq,
                  model_learning_rate: float = const.model_learning_rate,
@@ -34,7 +33,6 @@ class MyNavigator(BaseEstimator, ClassifierMixin):
         self.memory_size = memory_size
         self.gamma = gamma
         self.batch_size = batch_size
-        self.expl_noise = expl_noise
         self.tau = tau
         self.policy_freq = policy_freq
 
@@ -46,12 +44,12 @@ class MyNavigator(BaseEstimator, ClassifierMixin):
     def fit(self, i: int, env: utils_env.Environment):
         self.ag_1 = agent.DRLAgent(self.num_states, self.num_actions,
                                  self.memory_size, self.gamma, self.batch_size,
-                                 self.expl_noise, self.tau, self.model_learning_rate,
+                                 self.tau, self.model_learning_rate,
                                  self.num_fc_1, self.num_fc_2)
         self.ag_1.set_model_path(str(i) + '_0')  # save each candidate's model separately
         self.ag_2 = agent.DRLAgent(self.num_states, self.num_actions,
                                    self.memory_size, self.gamma, self.batch_size,
-                                   self.expl_noise, self.tau, self.model_learning_rate,
+                                   self.tau, self.model_learning_rate,
                                    self.num_fc_1, self.num_fc_2)
         self.ag_2.set_model_path(str(i) + '_1')  # save each candidate's model separately
 
@@ -67,10 +65,10 @@ class MyNavigator(BaseEstimator, ClassifierMixin):
         x = pd.Series(hist)
         y = x.rolling(window=N).mean().iloc[N - 1:]
         if not y.empty:
-            score = y.iloc[-1]
+            score = max(y)  # max ever achieved avg_score
         else:
             score = 0.
-        print('\n', score, hist)
+        # print('\n', score, hist)
         return score
 
 
@@ -84,11 +82,10 @@ def grid_search():
         'max_action': [0.1, 0.5, 1.0],
         'memory_size': [200000],
         'gamma': [0.95, 0.99],
-        'batch_size': [32, 64, 128, 256],
-        'expl_noise': [0.1, 0.3],
-        'tau': [0.01, 0.001],
+        'batch_size': [64, 128, 256],
+        'tau': [0.01, 0.05],
         'policy_freq': [1, 2, 3],
-        'model_learning_rate': [0.001, 0.0001, 0.00001],
+        'model_learning_rate': [0.001, 0.0001],
         'num_fc_1': [128, 64, 32, 16],
         'num_fc_2': [128, 64, 32, 16]  # todo less that fc_1 or /2
     }
