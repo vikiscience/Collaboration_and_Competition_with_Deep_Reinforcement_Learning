@@ -83,6 +83,6 @@ Agent training is done using Python 3.6 and PyTorch 0.4.0.
    
 ### Model
 
-The problem of agent collaboration and competition was solved by utilizing Deep Reinforcement Learning setting, particularly by implementing a MADDPG algorithm.
+The problem of agent collaboration and competition was solved by utilizing Deep Reinforcement Learning, particularly by implementing a DDPG algorithm in a Multi-Agent setting.
 
 For model details, see [report].

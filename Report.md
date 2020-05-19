@@ -35,7 +35,7 @@ Generally, RL algorithms can be divided into 3 categories:
 
 Actor-Critic methods combine the advantages of the other two categories of methods. In this case, an **Actor** represents the learned policy `pi` and is used to select actions, while the **Critic** represents the action-value function `Q` and evaluates `pi` by gathering experience and learning action values. Actor's training is then based on the learned action values.
 
-In this project, an Actor-Critic method called "Deep Deterministic Policy Gradient" (**DDPG**) was used (see this [paper](https://arxiv.org/abs/1509.02971)). In case of playing tennis, a Multi-Agent RL setting was used to train each player separately. Thus, both Agents observed the common (concatenated) Environment state and knew each other's actions, but each learns to act according to his own reward signal.
+In this project, an Actor-Critic method called "Deep Deterministic Policy Gradient" (**DDPG**) was used (see this [paper](https://arxiv.org/abs/1509.02971)). In case of playing tennis, a Multi-Agent RL setting was used to train each player separately. Thus, both Agents observed the common (concatenated) Environment state and knew each other's actions, but each learned to act according to his own reward signal.
 
 The nature of interaction between agents can be either cooperative (all agents must maximize a shared return), competitive (agents have conflicting goals), or mixed (like in our tennis case), and the learning algorithm should be able to tackle this type of interaction.
 
@@ -57,14 +57,14 @@ In order to solve these two major problems, DDPG algorithm builds upon DQN and i
 3) Policy updates are delayed until the value estimate has converged. This technique couples value function `Q` and policy `pi` more effectively.
 
 
-#### Experience replay buffer
+#### Experience Replay Buffer
 
 It is a notable fact that training DNNs in RL settings is instable due to correlations in sequences of Environment observations. Traditionally, this instability is overcome by letting the Agent re-learn from its long-passed experience.
 
 Hence, the Agent maintains a replay buffer of capacity `M` where he stores his previous experience in form of tuples `(s_t, a_t, r_{t+1}, s_{t+1})`. Every now and then, the Agent samples a mini-batch of tuples randomly from the buffer and uses these to update `Q`. Thus, the sequence correlation gets eliminated, and the learned policy is more robust.
 
 
-#### Target networks
+#### Target Networks
 
 To solve a problem of "moving target" (correlations between action-values and target values), we don't change the DNN weights during training step, because they are used for estimating next best action. We achieve this by maintaining two DNNs - one is used for training, the other ("_target network_") is fixed and only updated with current weights after each `d` steps. 
 
@@ -88,7 +88,7 @@ At the same time, each `d` iterations, both target Actor and Critic `pi_target`,
 
 #### Ornstein-Uhlenbeck Noise
 
-A major challenge of learning in continuous action spaces is exploration. An advantage of off-policy algorithms such as DDPG is that we can treat the problem of exploration independently from the learning algorithm. We constructed an exploration policy `pi_target` by adding noise sampled from a noise process `N` to our actor policy:
+A major challenge of learning in continuous action spaces is exploration. An advantage of off-policy algorithms such as DDPG is that we can treat the problem of exploration independently from the learning algorithm. We constructed an exploration policy `pi_target` by adding noise sampled from a noise process `N` to the Actor policy:
 
 `pi_target(s_t) = pi_φ(s_t) + N`
 
@@ -116,13 +116,13 @@ In order to encourage more exploration in the beginning of training, we use a li
    
       4.1.3. Take action `a_t`, observe reward `r_{t+1}` and next state `s_{t+1}` of the Environment 
    
-      4.1.4. Store tuple `(s_t, a_t, r_{t+1}, s_{t+1}, done_{t+1})` in Agents' replay memory, where `done_{t+1} = 1` if the episode ended at timestep `t+1`, else `0`. Note that all states and actions in this tuple are the concatenated ones coming from both Agents, but the reward value belongs to the corresponding agent
+      4.1.4. Store tuple `(s_t, a_t, r_{t+1}, s_{t+1}, done_{t+1})` in Agents' replay memory, where `done_{t+1} = 1` if the episode ended at timestep `t+1`, else `0`. Note that all states and actions in this tuple are the concatenated ones coming from both Agents, but the reward value belongs to the corresponding Agent
    
       4.1.5. For each Agent:
       
       * Sample random mini-batch of size `B` from memory
       
-      * Compute target action `a' = pi_target(s_{t+1}) + epsilon * noise`, where `noise ~ OUNoise(σ, θ, dt)`. Concatenate it with another Agent's action in order to use as input for Critic
+      * Compute target action `a' = pi_target(s_{t+1}) + epsilon * noise`, where `noise ~ OUNoise(σ, θ, dt)`. Concatenate it with another Agent's known action in order to use as input for Critic
       
       * `<target> = r_{t+1} + gamma * (1 - done_{t+1}) * Q_target(s_{t+1}, a')`
    
@@ -146,6 +146,8 @@ The interaction between the Agent and the Environment is implemented in `algo.py
 The Actor network architecture is sequential with 3 linear neuron layers and RELU as an activation function. State vector (a concatenation of Env state as seen by each Agent) is fed directly to the input layer, and the last layer's activation function is `tanh`. While the number of neurons in the first and second hidden layer is configurable (see variables `num_fc_1` and `num_fc_2` in `const.py`), the output layer has the dimensionality of the action space. Thus, Actor outputs the action only for the respective agent.
 
 The Critic network receives the concatenated states and actions vector as input. However, the actions are fed to the second hidden layer, whereas the states are fed to the input layer, as described in DDPG paper. Critic network has the same architecture as Actor, except that the output layer has 1 neuron without activation function.
+
+In `noise.py`, the classes for Ornstein-Uhlenbeck noise and epsilon decay are situated.
 
 Finally, Grid Search is implemented in `hyperparameter_search.py` in order to select the best Agent solving the given Environment. The script also documents what hyperparameter values were tested so far. Best resulting hyperparameters are already listed in `const.py`.
 
@@ -175,11 +177,8 @@ As mentioned above, the current best hyperparameters of the algorithm found by t
 
 # Future Work
 
-Other (single-agent) Actor-Critic RL algorithms can be implemented such as A3C, T3D or SAC.
+Other (Single-Agent) Actor-Critic RL algorithms can be implemented such as A3C, T3D or SAC.
 
 Furthermore, prioritized replay buffer may be utilized to sample important or rare experience tuples more often, proportionally to the received reward.
 
-Finally, some algorithms specifically developed for Multi-Agent RL setting can be considered, such as [MADDPG](https://arxiv.org/abs/1706.02275). It was shown to outperform DDPG on several Multi-Agent Particle Environments.
-
-
-This method considers action policies of other agents and is able to successfully learn policies that require complex multiagent coordination. Utilizing an ensemble of policies for each agent leads to more robust multi-agent policies. 
+Finally, some algorithms specifically developed for Multi-Agent RL setting can be considered, such as [MADDPG](https://arxiv.org/abs/1706.02275). It was shown to outperform DDPG on several Multi-Agent Particle Environments. This method considers action policies of other agents and is able to successfully learn policies that require complex multiagent coordination. Utilizing an ensemble of policies for each agent leads to more robust multi-agent policies. 
