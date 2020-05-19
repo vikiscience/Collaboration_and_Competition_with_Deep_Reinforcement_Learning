@@ -39,6 +39,13 @@ model_learning_rate = 0.001  # 0.00001
 num_fc_1 = 256  # 16
 num_fc_2 = 128  # 16
 
+# noise params
+ou_stddev = 0.2
+ou_theta = .13
+ou_dt = 1
+eps_start = 6
+eps_end = 0
+
 
 def myprint(*args, **kwargs):
     if verbose:

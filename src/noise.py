@@ -5,7 +5,8 @@ import numpy as np
 
 # Based on http://math.stackexchange.com/questions/1287634/implementing-ornstein-uhlenbeck-in-matlab
 class OrnsteinUhlenbeckActionNoise:
-    def __init__(self, stddev=0.2, theta=.13, dt=1, x0=None):  # orig: theta=.15, dt=1e-2
+    def __init__(self, stddev=const.ou_stddev,
+                 theta=const.ou_theta, dt=const.ou_dt, x0=None):  # orig: theta=.15, dt=1e-2
         self.theta = theta
         self.mu = np.zeros(const.action_size)
         self.sigma = stddev * np.ones(const.action_size)
@@ -27,7 +28,8 @@ class OrnsteinUhlenbeckActionNoise:
 
 
 class GLIE:
-    def __init__(self, eps_start=6, eps_end=0, num_episodes=const.num_episodes):
+    def __init__(self, eps_start=const.eps_start, eps_end=const.eps_end,
+                 num_episodes=const.num_episodes):
         self.eps_start = eps_start
         self.eps_end = eps_end
         self.eps_decay = eps_start / num_episodes
