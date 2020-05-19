@@ -98,6 +98,18 @@ def get_env_info():
     env.get_info()
 
 
+def plot_raw_noise():
+    from src import noise, utils_plot
+    n = noise.OrnsteinUhlenbeckActionNoise()
+    n.reset()
+    n_list = []
+    for e in range(const.num_episodes):
+        n_list.append(n())
+    fp_noise = const.file_path_img_noise
+    fp_noise_raw = Path(fp_noise.parent, fp_noise.stem + '_raw' + fp_noise.suffix)
+    utils_plot.plot_scatter(n_list, title_text='Noise Raw', fp=fp_noise_raw)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train and test a Deep '
                                                  'Reinforcement Learning agent '
