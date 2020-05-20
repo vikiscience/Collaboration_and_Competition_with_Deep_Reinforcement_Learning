@@ -1,3 +1,5 @@
+[image2]: output/score_ref.png
+
 # Problem Setting
 
 The problem of playing tennis can be formulated as a Reinforcement Learning (**RL**) problem, where an Agent learns through interaction with Environment to achieve their goal - maintaining the ball in the air for as many time steps as possible. The Agent can observe the state which the Environment is in, and takes actions that affect this state. In turn, the Environment gives the Agent feedback ("rewards") based on the actions.
@@ -173,6 +175,14 @@ As mentioned above, the current best hyperparameters of the algorithm found by t
 `num_fc_actor = 256`
 
 `num_fc_critic = 128`
+
+# Results
+
+Current best result is: +0.719 (after 1500 episodes)
+
+The Environment was solved in 1356 episodes by achieving the avgerage score: +0.509
+
+![image2]
 
 
 # Future Work
