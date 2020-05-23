@@ -27,7 +27,7 @@ num_episodes = 1500
 max_action = 1.
 
 # agent params
-memory_size = 200000  # 100000
+memory_size = 300000  # 100000
 gamma = 0.99
 batch_size = 128
 tau = 0.06  # 0.001
