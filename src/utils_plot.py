@@ -20,7 +20,8 @@ def plot_history_rolling_mean(hist, N=const.rolling_mean_N, fp=const.file_path_i
         plt.plot(hist, c='darkorchid', marker='.', markevery=[-1], label='score')
 
     # plot rolling mean scores
-    plt.plot(y, c='blue', marker='.', markevery=[-1], label='rolling_score (N={})'.format(N))
+    # plt.plot(y, c='blue', marker='.', markevery=[-1], label='rolling_score (N={})'.format(N))
+    plt.plot(y, c='blue', label='rolling_score (N={})'.format(N))
 
     # plot line to signify the aimed high score
     x1, x2 = 0, len(hist)
@@ -30,10 +31,13 @@ def plot_history_rolling_mean(hist, N=const.rolling_mean_N, fp=const.file_path_i
     # annotate last_history and last_rolling point
     last_points = [(len(hist) - 1, hist[-1])]
     if not y.empty:
-        last_points.append((len(hist) - 1, y.iloc[-1]))
+        last_points.append((len(hist) - 1, y.iloc[-1]))  # last rolling value
+        last_points.append((y.idxmax(), y.max()))  # max rolling value
 
     for (i, j) in last_points:
-        ax.annotate('{:.3f}'.format(j), xy=(i, j), xytext=(i + 0.1, j))
+        # ax.annotate('{:.3f}'.format(j), xy=(i, j), xytext=(i + 0.1, j))
+        ax.plot([i], [j], marker='o', color='red', markersize=4)
+        plt.text(i, j, '{:.3f}'.format(j))
 
     plt.xlabel('Episodes')
     plt.ylabel('Score (Sum of Rewards)')
