@@ -37,6 +37,7 @@ policy_freq = 1
 model_learning_rate = 0.001  # 0.0001
 num_fc_1 = 256
 num_fc_2 = 128
+with_bn = True
 
 # noise params
 ou_stddev = 0.2

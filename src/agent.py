@@ -42,17 +42,18 @@ class DRLAgent:
         self.model_learning_rate = model_learning_rate
         self.num_fc_1 = num_fc_1  # todo actor & critic
         self.num_fc_2 = num_fc_2
+        self.with_bn = const.with_bn
 
         self.actor = models.Actor(state_dim=self.num_states, action_dim=self.num_actions,
-                                  num_fc_1=self.num_fc_1, num_fc_2=self.num_fc_2)
+                                  num_fc_1=self.num_fc_1, num_fc_2=self.num_fc_2, with_bn=self.with_bn)
         self.actor_target = models.Actor(state_dim=self.num_states, action_dim=self.num_actions,
-                                         num_fc_1=self.num_fc_1, num_fc_2=self.num_fc_2)
+                                         num_fc_1=self.num_fc_1, num_fc_2=self.num_fc_2, with_bn=self.with_bn)
         self.actor_opt = Adam(self.actor.parameters(), lr=self.model_learning_rate, weight_decay=0)
 
         self.critic = models.Critic(state_dim=self.num_states, action_dim=self.num_actions,
-                                    num_fc_1=self.num_fc_1, num_fc_2=self.num_fc_2)
+                                    num_fc_1=self.num_fc_1, num_fc_2=self.num_fc_2, with_bn=self.with_bn)
         self.critic_target = models.Critic(state_dim=self.num_states, action_dim=self.num_actions,
-                                           num_fc_1=self.num_fc_1, num_fc_2=self.num_fc_2)
+                                           num_fc_1=self.num_fc_1, num_fc_2=self.num_fc_2, with_bn=self.with_bn)
         self.critic_opt = Adam(self.critic.parameters(), lr=self.model_learning_rate, weight_decay=0)
 
         self._model_summary(self.actor, title='Actor')
@@ -67,13 +68,14 @@ class DRLAgent:
         self.noise.reset()
 
     def act(self, states):
-        s_tensor = torch.Tensor(states)
+        s_tensor = torch.Tensor(states).reshape(1, -1)  # shape (1, 2) to use in BN
         self.actor.eval()
         with torch.no_grad():
             a = self.actor.forward(s_tensor).detach().numpy()
         self.actor.train()
         curr_noise = self.glie.get_eps() * self.noise()
         self.noise_list.append(curr_noise)
+        a = a.flatten()  # shape (2,)
         actions = a + curr_noise  # result in shape (2,)
         actions = np.clip(actions, - const.max_action, const.max_action)
         return actions
@@ -93,12 +95,14 @@ class DRLAgent:
         self.actor = models.Actor(state_dim=checkpoint['num_states'],
                                   action_dim=checkpoint['num_actions'],
                                   num_fc_1=checkpoint['num_fc_1'],
-                                  num_fc_2=checkpoint['num_fc_2'])
+                                  num_fc_2=checkpoint['num_fc_2'],
+                                  with_bn=const.with_bn)
         self.actor.load_state_dict(checkpoint['actor'])
         self.critic = models.Critic(state_dim=checkpoint['num_states'],
                                     action_dim=checkpoint['num_actions'],
                                     num_fc_1=checkpoint['num_fc_1'],
-                                    num_fc_2=checkpoint['num_fc_2'])
+                                    num_fc_2=checkpoint['num_fc_2'],
+                                    with_bn=const.with_bn)
         self.critic.load_state_dict(checkpoint['critic'])
 
         # change mode (to use only for inference)
