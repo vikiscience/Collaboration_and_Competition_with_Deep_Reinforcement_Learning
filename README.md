@@ -23,9 +23,7 @@ The task is episodic, and in order to solve the environment, the agents must get
 
 The environment is considered solved, when the average (over 100 episodes) of those **scores** is at least +0.5.
 
-Current best result is: +0.719
-
-<!--- Env solved in 1356 episodes, avg_score: 0.509 --->
+Current best result is: +1.180
 
 ![image2]
 

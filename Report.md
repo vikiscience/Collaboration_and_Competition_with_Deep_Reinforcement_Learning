@@ -178,9 +178,9 @@ As mentioned above, the current best hyperparameters of the algorithm found by t
 
 # Results
 
-Current best result is: +0.719 (after 1500 episodes)
+Current best result is: +0.851 (after 1500 episodes), peaked at +1.180 (after 1233 episodes)
 
-The Environment was solved in 1356 episodes by achieving the avgerage score: +0.509
+The Environment was solved in 1082 episodes by achieving the avgerage score: +0.506
 
 ![image2]
 
