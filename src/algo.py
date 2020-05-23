@@ -25,6 +25,9 @@ class DRLAlgo:
         history = []
         rolling_window = deque(maxlen=const.rolling_mean_N)
         solved = False
+        best_score = 0.
+        best_e = 0
+        best_found = False
 
         for e in range(self.num_episodes):
             env_info = self.env.reset(train_mode=True)[self.brain_name]  # reset the environment
@@ -60,17 +63,22 @@ class DRLAlgo:
             score = np.max(scores)  # max of scores over all agents for this episode
             rolling_window.append(score)
             history.append(score)
+            curr_best_score = np.mean(rolling_window)
             print("\r -> Episode: {}/{}, score: {:.3f}, avg_score: {:.3f}".format(e + 1,
                                                                                   self.num_episodes,
                                                                                   score,
-                                                                                  np.mean(rolling_window)), end='')
+                                                                                  curr_best_score), end='')
 
-            if (e + 1) % 100 == 0 or e + 1 == self.num_episodes:
+            # if (e + 1) % 100 == 0 or e + 1 == self.num_episodes:
+            if curr_best_score > best_score or (e + 1 == self.num_episodes and not best_found):
+                best_score = curr_best_score
+                best_e = e + 1
+                best_found = True
                 self.agent_1.save()
                 self.agent_2.save()
 
             if np.mean(rolling_window) >= const.high_score and not solved:
-                print('\nEnv solved in {:d} episodes, avg_score: {:.3f}'.format(e, np.mean(rolling_window)))
+                print('\nEnv solved in {:d} episodes, avg_score: {:.3f}'.format(e + 1, np.mean(rolling_window)))
                 solved = True
 
         # plot scores
@@ -80,7 +88,7 @@ class DRLAlgo:
         if with_close:
             self.env.close()
 
-        return history
+        return history, best_e, best_score
 
     def test(self, num_episodes=const.num_episodes_test):
         self.agent_1.load()

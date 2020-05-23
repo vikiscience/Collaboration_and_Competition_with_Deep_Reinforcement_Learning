@@ -53,9 +53,10 @@ def train_two_agents():
     ag_2 = agent.DRLAgent()
     ag_2.set_model_path(2)
     al = algo.DRLAlgo(env, ag_1, ag_2)
-    history = al.train()
+    history, best_e, best_score = al.train()
     print('\nFinal score: {:.3f}'.format(np.mean(history[-const.rolling_mean_N:])))
     print('Final memory length:', ag_1.memory.get_length())
+    print('Best score in {:d} episodes, avg_score: {:.3f}'.format(best_e, best_score))
 
     # plot losses
     losses_lists = [ag_1.actor_loss_list, ag_2.actor_loss_list,

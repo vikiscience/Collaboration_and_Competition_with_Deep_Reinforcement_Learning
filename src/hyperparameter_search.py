@@ -56,7 +56,8 @@ class MyNavigator(BaseEstimator, ClassifierMixin):
         self.al = algo.DRLAlgo(env, self.ag_1, self.ag_2, self.num_episodes)
         self.al.set_image_path(i)  # save each candidate's score separately
 
-        history = self.al.train(with_close=False)  # do not close the Env so that other agents can be trained
+        # do not close the Env so that other agents can be trained
+        history, _, best_score = self.al.train(with_close=False)  # todo use best score?
         score = self._get_score(history)
         return score
 
